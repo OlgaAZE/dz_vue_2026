@@ -8,9 +8,6 @@ const navigation = ref([
   { id: '5', title: 'Контакты', href: '#contacts' }
 ]);
  
-function changeColor(e) {
-    e.target.style.color = "red";
-}
 </script>
 <template>
     <div class="head">
@@ -21,7 +18,6 @@ function changeColor(e) {
     </header>
     <nav class="navigation">
         <a v-for="item in navigation" 
-         @mouseover="changeColor"
         :key="item.id"
         :href="item.href"
         class="navigation__link">
@@ -69,6 +65,10 @@ function changeColor(e) {
     font-size: 25px;
     white-space: nowrap;
     transition: color 0.2s ease;
+}
+
+.navigation__link:hover {
+    color:aquamarine;
 }
 
 .background {
