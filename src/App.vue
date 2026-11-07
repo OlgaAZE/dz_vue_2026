@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { onMounted, ref, computed } from "vue";
 import ShopHeader from "./views/ShopHeader.vue";
 import ItemCard from "./ItemCard.vue";
 import { goodsApi } from "../public/goods.js";
@@ -8,22 +8,34 @@ const goods = ref([]);
 const total = ref(0);
 
 const filterName = ref("");
-async function load(params) {
-  goods.value = await goodsApi().then((data) => {
-    return data;
-  });
-}
-load();
-const filterProducts = computed(() => {
-  return goods.value.filter((good) =>
-    good.title.toLowerCase().includes(filterName.value.toLowerCase()),
-  );
+const priceRange = ref([0, 0])
+goodsApi().then((data) => {
+   try {
+    goods.value = data;
+  } catch (error) {
+    console.log(error);
+  }
 });
-function addToCard() {
-  total.value++;
+
+const filterProducts = computed(() => {
+  const [fPrice, sPrice] = priceRange.value;
+  return goods.value.filter((good) =>
+    good.title.toLowerCase().includes(filterName.value.toLowerCase()) && good.price <= sPrice && good.price >= fPrice);
+});
+const getMaxPrice = computed(() => {
+  if (!goods.value.length) return 0;
+  return Math.max(...goods.value.map(g => g.price));
+}) 
+const getMinPrice = computed(() => {
+  if (!goods.value.length) return 0;
+  return Math.min(...goods.value.map(g => g.price));
+}) 
+
+function addToCard(id, quantGoods) {
+  total.value+= Number(quantGoods);
 }
-function deleteFromCard() {
-  total.value--;
+function deleteFromCard(id, quantGoods) {
+  total.value-= Number(quantGoods);
 }
 </script>
 
@@ -39,6 +51,7 @@ function deleteFromCard() {
           :product="good"
           @addToCard="addToCard"
           @deleteFromCard="deleteFromCard"
+          v-model="quantGoods"
         />
       </div>
     </div>
@@ -50,7 +63,7 @@ function deleteFromCard() {
       <div v-else>
         <span>В корзине нет товаров</span>
       </div>
-      <GoodsFilter v-model="filterName" />
+      <GoodsFilter v-model="filterName" v-model:priceRange="priceRange" :maxPrice="getMaxPrice" :minPrice="getMinPrice"/>
     </div>
   </main>
 </template>

@@ -1,7 +1,9 @@
 async function goodsApi() {
    const response = await fetch("https://fakestoreapi.com/products");
-   const data = await response.json();
-   return data;
+   if(!response.ok) {
+      throw new Error(`error ${response.status}`)
+   }
+   return response.json();
 }
 
 export {goodsApi};

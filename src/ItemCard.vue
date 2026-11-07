@@ -1,19 +1,23 @@
 <script setup>
-import { defineProps } from "vue";
+import { ref, defineProps } from "vue";
 const emit = defineEmits(["addToCard", "deleteFromCard"]);
-defineProps(["product"]);
+const props = defineProps(["product"]);
+const quantGoods = defineModel('quantGoods', { 
+    type: Number, 
+    default: 0 
+});
 function addProd() {
-  emit("addToCard");
+  emit("addToCard", props.product.id, quantGoods.value);
 }
 function deleteProd() {
-  emit("deleteFromCard");
+  emit("deleteFromCard", props.product.id, quantGoods.value);
 }
 </script>
 <template>
   <div class="product-card">
     <div>
       <img
-        :src="product.image"
+        :src="props.product.image"
         :alt="product.name"
         class="product-card__image"
       />
@@ -28,6 +32,7 @@ function deleteProd() {
     </div>
     <div class="btn">
       <button type="button" @click="addProd">+</button>
+      <input type="number" class="good_quantity" v-model.number="quantGoods" min="0"/>
       <button type="button" @click="deleteProd">-</button>
     </div>
   </div>
@@ -73,5 +78,8 @@ function deleteProd() {
   position: absolute;
   bottom: 10px;
   right: 30px;
+}
+.good_quantity {
+  width: 30px;
 }
 </style>
